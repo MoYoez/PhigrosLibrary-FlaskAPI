@@ -56,15 +56,15 @@ class ByteReader:
         fc = self.data[self.position]
         self.position += 1
         diff = difficulty[songId]
-        song_names = info[songId]
         records = []
+        song_names = info[songId]
         for level in range(len(diff)):
             if getBool(exists, level):
                 scoreAcc = self.readScoreAcc()
                 scoreAcc["level"] = levels[level]
                 scoreAcc["fc"] = getBool(fc, level)
                 scoreAcc["songId"] = songId
-                scoreAcc["songname"] = songId.split(".")[0]
+                scoreAcc["songname"] = song_names
                 scoreAcc["difficulty"] = diff[level]
                 scoreAcc["rks"] = (scoreAcc["acc"] - 55) / 45
                 scoreAcc["rks"] = (
@@ -98,8 +98,8 @@ def parse_render_bests(gameRecord, overflow: int):
     records = []
     if overflow < 0:
         overflow = 0
-    if overflow > 20:
-        overflow = 20
+    if overflow > 21:
+        overflow = 21
     reader = ByteReader(gameRecord)
     for i in range(reader.readVarShort()):
         songId = reader.readString()[:-2]
@@ -142,8 +142,8 @@ class BestsRender:
             line = line[:-1].split("\\")
             infos = []
             for i in range(1, len(line)):
-                infos.append(float(line[i]))
-            info[line[0]] = infos[1]
+                infos.append(str(line[i]))
+            info[line[0]] = infos[0]
 
     @staticmethod
     def get_playerId(sessionToken):

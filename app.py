@@ -7,14 +7,15 @@ app = Flask(__name__)
 # init
 
 BestsRender.read_difficulty("difficulty.csv")
+BestsRender.read_playerInfo("info.csv")
 
 
-@app.route('/', methods=["GET"])
+@app.route("/", methods=["GET"])
 def index():
     return jsonify({"message": "Hello World! Phigros API SERVICE IS ALIVE!"})
 
 
-@app.route('/api/phi/bests', methods=["GET"])
+@app.route("/api/phi/bests", methods=["GET"])
 def get_bests():
     session = request.args.get("session")
     overflow = request.args.get("overflow")
@@ -25,7 +26,7 @@ def get_bests():
     else:
         overflow = int(overflow)
     try:
-        bests,isphi = BestsRender.get_bests(session, overflow)
+        bests, isphi = BestsRender.get_bests(session, overflow)
         is_phi = {"phi": isphi}
         best_list_args = {"bests": bests}
         best_list = {**is_phi, **best_list_args}
@@ -33,13 +34,13 @@ def get_bests():
         status = "true"
         content = {**best_list, **get_formatData}
         data = {"status": status, "content": content}
-        data = json.dumps(data, ensure_ascii=False).encode('utf-8')
+        data = json.dumps(data, ensure_ascii=False).encode("utf-8")
         data = make_response(data)
-        data.headers['Content-Type'] = 'application/json; charset=utf-8'
+        data.headers["Content-Type"] = "application/json; charset=utf-8"
     except Exception as e:
         return jsonify({"message": str(e)})
     return data
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
