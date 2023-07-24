@@ -1,6 +1,6 @@
 ## Phigros Flask API Reference
 
-### Based [PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)
+### Based On [PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)
 
 ### API List
 
