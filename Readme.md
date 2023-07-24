@@ -1,4 +1,4 @@
-## Phigros Flask API Referce
+## Phigros Flask API Reference
 
 ### Based [PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)
 
