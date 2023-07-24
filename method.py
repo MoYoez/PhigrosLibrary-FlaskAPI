@@ -5,16 +5,16 @@ import io
 import struct
 import zipfile
 import requests
-import codecs
 
 levels = ["EZ", "HD", "IN", "AT"]
 difficulty = {}
+info = {}
 
 global_headers = {
     "X-LC-Id": "rAK3FfdieFob2Nn8Am",
     "X-LC-Key": "Qr9AEqtuoSVS3zeD6iVbM4ZC0AtkJcQ89tywVyi0",
     "User-Agent": "LeanCloud-CSharp-SDK/1.0.3",
-    "Accept": "application/json"
+    "Accept": "application/json",
 }
 
 key = base64.b64decode("6Jaa0qVAJZuXkZCLiOa/Ax5tIZVu+taKUN1V1nqwkks=")
@@ -41,11 +41,11 @@ class ByteReader:
     def readString(self):
         length = self.data[self.position]
         self.position += length + 1
-        return self.data[self.position - length:self.position].decode()
+        return self.data[self.position - length : self.position].decode()
 
     def readScoreAcc(self):
         self.position += 8
-        scoreAcc = struct.unpack("if", self.data[self.position - 8:self.position])
+        scoreAcc = struct.unpack("if", self.data[self.position - 8 : self.position])
         return {"score": scoreAcc[0], "acc": scoreAcc[1]}
 
     def readRecord(self, songId):
@@ -56,6 +56,7 @@ class ByteReader:
         fc = self.data[self.position]
         self.position += 1
         diff = difficulty[songId]
+        song_names = info[songId]
         records = []
         for level in range(len(diff)):
             if getBool(exists, level):
@@ -63,10 +64,12 @@ class ByteReader:
                 scoreAcc["level"] = levels[level]
                 scoreAcc["fc"] = getBool(fc, level)
                 scoreAcc["songId"] = songId
-                scoreAcc["songname"] = songId.split(".")[0]
+                scoreAcc["songname"] = song_names
                 scoreAcc["difficulty"] = diff[level]
                 scoreAcc["rks"] = (scoreAcc["acc"] - 55) / 45
-                scoreAcc["rks"] = scoreAcc["rks"] * scoreAcc["rks"] * scoreAcc["difficulty"]
+                scoreAcc["rks"] = (
+                    scoreAcc["rks"] * scoreAcc["rks"] * scoreAcc["difficulty"]
+                )
                 records.append(scoreAcc)
         self.position = end_position
         return records
@@ -103,20 +106,25 @@ def parse_render_bests(gameRecord, overflow: int):
         record = reader.readRecord(songId)
         records.extend(record)
     records.sort(key=lambda x: x["rks"], reverse=True)
-    render = [max(filter(lambda x: x["score"] == 1000000, records), key=lambda x: x["difficulty"])]
-    render.extend(records[:19 + overflow])
+    render = [
+        max(
+            filter(lambda x: x["score"] == 1000000, records),
+            key=lambda x: x["difficulty"],
+        )
+    ]
+    render.extend(records[: 19 + overflow])
     if render[0]["score"] == 1000000:
         isPhi = "true"
     else:
         isPhi = "false"
-    return render,isPhi
+    return render, isPhi
 
 
 class BestsRender:
     @staticmethod
     def read_difficulty(path):
         difficulty.clear()
-        with open(path,encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             lines = f.readlines()
         for line in lines:
             line = line[:-1].split(",")
@@ -126,10 +134,24 @@ class BestsRender:
             difficulty[line[0]] = diff
 
     @staticmethod
+    def read_playerInfo(path):
+        info.clear()
+        with open(path, encoding="utf-8") as f:
+            lines = f.readlines()
+        for line in lines:
+            line = line[:-1].split("\\")
+            infos = []
+            for i in range(1, len(line)):
+                infos.append(float(line[i]))
+            info[line[0]] = infos[1]
+
+    @staticmethod
     def get_playerId(sessionToken):
         headers = global_headers.copy()
         headers["X-LC-Session"] = sessionToken
-        response = requests.get("https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/users/me", headers=headers)
+        response = requests.get(
+            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/users/me", headers=headers
+        )
         result = response.json()["nickname"]
         return result
 
@@ -137,36 +159,56 @@ class BestsRender:
     def get_summary(sessionToken):
         headers = global_headers.copy()
         headers["X-LC-Session"] = sessionToken
-        response = requests.get("https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
-                                headers=headers)
+        response = requests.get(
+            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+            headers=headers,
+        )
         result = response.json()["results"][0]
         updateAt = result["updatedAt"]
         url = result["gameFile"]["url"]
         summary = base64.b64decode(result["summary"])
         summary = struct.unpack("=BHfBx%ds12H" % summary[8], summary)
-        return {"updateAt": updateAt, "url": url, "saveVersion": summary[0], "challenge": summary[1], "rks": summary[2],
-                "gameVersion": summary[3], "avatar": summary[4].decode(), "EZ": summary[5:8], "HD": summary[8:11],
-                "IN": summary[11:14], "AT": summary[14:17]}
+        return {
+            "updateAt": updateAt,
+            "url": url,
+            "saveVersion": summary[0],
+            "challenge": summary[1],
+            "rks": summary[2],
+            "gameVersion": summary[3],
+            "avatar": summary[4].decode(),
+            "EZ": summary[5:8],
+            "HD": summary[8:11],
+            "IN": summary[11:14],
+            "AT": summary[14:17],
+        }
 
     @staticmethod
     def get_formatData(sessionToken):
         headers = global_headers.copy()
         headers["X-LC-Session"] = sessionToken
-        response = requests.get("https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
-                                headers=headers)
+        response = requests.get(
+            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+            headers=headers,
+        )
         result = response.json()["results"][0]
         summary = base64.b64decode(result["summary"])
         get_id = BestsRender.get_playerId(sessionToken)
         print(get_id)
         summary = struct.unpack("=BHfBx%ds12H" % summary[8], summary)
-        return {"PlayerID": get_id, "ChallengeModeRank": summary[1], "RankingScore": summary[2]}
+        return {
+            "PlayerID": get_id,
+            "ChallengeModeRank": summary[1],
+            "RankingScore": summary[2],
+        }
 
     @staticmethod
     def get_bests(session, overflow):
         headers = global_headers.copy()
         headers["X-LC-Session"] = session
-        response = requests.get("https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
-                                headers=headers)
+        response = requests.get(
+            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+            headers=headers,
+        )
         result = response.json()["results"][0]["gameFile"]["url"]
         gameRecord = DataPackage.GameReader(result)
         gameRecord = decrypt_gameRecord(gameRecord)
