@@ -14,7 +14,7 @@ def index():
     return jsonify({"message": "Hello World! Phigros API SERVICE IS ALIVE!"})
 
 
-@app.route('/api/phi/bests', methods=["GET"])
+@app.route('/phi/bests', methods=["GET"])
 def get_bests():
     session = request.args.get("session")
     overflow = request.args.get("overflow")
