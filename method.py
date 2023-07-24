@@ -64,7 +64,7 @@ class ByteReader:
                 scoreAcc["level"] = levels[level]
                 scoreAcc["fc"] = getBool(fc, level)
                 scoreAcc["songId"] = songId
-                scoreAcc["songname"] = song_names
+                scoreAcc["songname"] = songId.split(".")[0]
                 scoreAcc["difficulty"] = diff[level]
                 scoreAcc["rks"] = (scoreAcc["acc"] - 55) / 45
                 scoreAcc["rks"] = (
