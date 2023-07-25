@@ -10,9 +10,9 @@
 
 ```
 {
-  "status": "true",
+  "status": true,
   "content": {
-    "phi": "true",
+    "phi": true,
     "bests": [
       {
         "score": 1000000,
