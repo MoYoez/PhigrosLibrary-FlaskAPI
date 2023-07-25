@@ -31,7 +31,7 @@ def get_bests():
         best_list_args = {"bests": bests}
         best_list = {**is_phi, **best_list_args}
         get_formatData = BestsRender.get_formatData(session)
-        status = "true"
+        status = True
         content = {**best_list, **get_formatData}
         data = {"status": status, "content": content}
         data = json.dumps(data, ensure_ascii=False).encode("utf-8")

@@ -114,9 +114,9 @@ def parse_render_bests(gameRecord, overflow: int):
     ]
     render.extend(records[: 19 + overflow])
     if render[0]["score"] == 1000000:
-        isPhi = "true"
+        isPhi = True
     else:
-        isPhi = "false"
+        isPhi = False
     return render, isPhi
 
 
