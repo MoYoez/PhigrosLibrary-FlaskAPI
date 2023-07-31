@@ -31,14 +31,13 @@ def get_bests():
         best_list_args = {"bests": bests}
         best_list = {**is_phi, **best_list_args}
         get_formatData = BestsRender.get_formatData(session)
-        status = True
         content = {**best_list, **get_formatData}
-        data = {"status": status, "content": content}
+        data = {"status": True, "content": content}
         data = json.dumps(data, ensure_ascii=False).encode("utf-8")
         data = make_response(data)
         data.headers["Content-Type"] = "application/json; charset=utf-8"
     except Exception as e:
-        return jsonify({"message": str(e)})
+        return jsonify({"status": False, "message": str(e)})
     return data
 
 
