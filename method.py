@@ -106,16 +106,17 @@ def parse_render_bests(gameRecord, overflow: int):
         record = reader.readRecord(songId)
         records.extend(record)
     records.sort(key=lambda x: x["rks"], reverse=True)
-    render = [
-        max(
-            filter(lambda x: x["score"] == 1000000, records),
-            key=lambda x: x["difficulty"],
-        )
-    ]
-    render.extend(records[: 19 + overflow])
-    if render[0]["score"] == 1000000:
+    try:
+        render = [
+            max(
+                filter(lambda x: x["score"] == 1000000, records),
+                key=lambda x: x["difficulty"],
+            )
+        ]
+        render.extend(records[: 19 + overflow])
         isPhi = True
-    else:
+    except ValueError:
+        render = records[: 19 + overflow]
         isPhi = False
     return render, isPhi
 
