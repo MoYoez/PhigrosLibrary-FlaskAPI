@@ -41,11 +41,11 @@ class ByteReader:
     def readString(self):
         length = self.data[self.position]
         self.position += length + 1
-        return self.data[self.position - length : self.position].decode()
+        return self.data[self.position - length: self.position].decode()
 
     def readScoreAcc(self):
         self.position += 8
-        scoreAcc = struct.unpack("if", self.data[self.position - 8 : self.position])
+        scoreAcc = struct.unpack("if", self.data[self.position - 8: self.position])
         return {"score": scoreAcc[0], "acc": scoreAcc[1]}
 
     def readRecord(self, songId):
@@ -68,7 +68,7 @@ class ByteReader:
                 scoreAcc["difficulty"] = diff[level]
                 scoreAcc["rks"] = (scoreAcc["acc"] - 55) / 45
                 scoreAcc["rks"] = (
-                    scoreAcc["rks"] * scoreAcc["rks"] * scoreAcc["difficulty"]
+                        scoreAcc["rks"] * scoreAcc["rks"] * scoreAcc["difficulty"]
                 )
                 records.append(scoreAcc)
         self.position = end_position
@@ -113,10 +113,10 @@ def parse_render_bests(gameRecord, overflow: int):
                 key=lambda x: x["difficulty"],
             )
         ]
-        render.extend(records[: 19 + overflow])
+        render.extend(records[:19 + overflow])
         isPhi = True
     except ValueError:
-        render = records[: 19 + overflow]
+        render = records[:19 + overflow]
         isPhi = False
     return render, isPhi
 
