@@ -5,10 +5,21 @@ import io
 import struct
 import zipfile
 import requests
+from collections import OrderedDict
+
 
 levels = ["EZ", "HD", "IN", "AT"]
-difficulty = {}
+difficulty = OrderedDict()
 info = {}
+info_by = {}
+info_illustrator = {}
+info_ez_desinger = {}
+info_hd_designer = {}
+info_in_desingner = {}
+info_at_designer = {}
+
+# info saver
+
 
 global_headers = {
     "X-LC-Id": "rAK3FfdieFob2Nn8Am",
@@ -41,11 +52,11 @@ class ByteReader:
     def readString(self):
         length = self.data[self.position]
         self.position += length + 1
-        return self.data[self.position - length: self.position].decode()
+        return self.data[self.position - length : self.position].decode()
 
     def readScoreAcc(self):
         self.position += 8
-        scoreAcc = struct.unpack("if", self.data[self.position - 8: self.position])
+        scoreAcc = struct.unpack("if", self.data[self.position - 8 : self.position])
         return {"score": scoreAcc[0], "acc": scoreAcc[1]}
 
     def readRecord(self, songId):
@@ -68,7 +79,7 @@ class ByteReader:
                 scoreAcc["difficulty"] = diff[level]
                 scoreAcc["rks"] = (scoreAcc["acc"] - 55) / 45
                 scoreAcc["rks"] = (
-                        scoreAcc["rks"] * scoreAcc["rks"] * scoreAcc["difficulty"]
+                    scoreAcc["rks"] * scoreAcc["rks"] * scoreAcc["difficulty"]
                 )
                 records.append(scoreAcc)
         self.position = end_position
@@ -113,12 +124,28 @@ def parse_render_bests(gameRecord, overflow: int):
                 key=lambda x: x["difficulty"],
             )
         ]
-        render.extend(records[:19 + overflow])
+        render.extend(records[: 19 + overflow])
         isPhi = True
     except ValueError:
-        render = records[:19 + overflow]
+        render = records[: 19 + overflow]
         isPhi = False
     return render, isPhi
+
+
+def get_songs_stat_main(gameRecord, songid, diff):
+    reader = ByteReader(gameRecord)
+    getdiff = diff  # Diff should be EZ,HD,IN,AT
+    if getdiff != "EZ" and getdiff != "HD" and getdiff != "IN" and getdiff != "AT":
+        getdiff = "IN"
+    for i in range(reader.readVarShort()):
+        songId = reader.readString()[:-2]
+        record = reader.readRecord(songId)
+        if songId == songid:
+            if record[0]["level"] == getdiff:
+                return record[0]
+        else:
+            continue
+        return None
 
 
 class BestsRender:
@@ -145,6 +172,15 @@ class BestsRender:
             for i in range(1, len(line)):
                 infos.append(str(line[i]))
             info[line[0]] = infos[0]
+            info_by[line[0]] = infos[1]
+            info_illustrator[line[0]] = infos[2]
+            info_ez_desinger[line[0]] = infos[3]
+            info_hd_designer[line[0]] = infos[4]
+            info_in_desingner[line[0]] = infos[5]
+            try:
+                info_at_designer[line[0]] = infos[6]
+            except Exception:
+                info_at_designer[line[0]] = ""
 
     @staticmethod
     def get_playerId(sessionToken):
@@ -194,7 +230,6 @@ class BestsRender:
         result = response.json()["results"][0]
         summary = base64.b64decode(result["summary"])
         get_id = BestsRender.get_playerId(sessionToken)
-        print(get_id)
         summary = struct.unpack("=BHfBx%ds12H" % summary[8], summary)
         return {
             "PlayerID": get_id,
@@ -214,3 +249,16 @@ class BestsRender:
         gameRecord = DataPackage.GameReader(result)
         gameRecord = decrypt_gameRecord(gameRecord)
         return parse_render_bests(gameRecord, overflow)
+
+    @staticmethod
+    def get_songs_stats(session, songid, diff):
+        headers = global_headers.copy()
+        headers["X-LC-Session"] = session
+        response = requests.get(
+            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+            headers=headers,
+        )
+        result = response.json()["results"][0]["gameFile"]["url"]
+        gameRecord = DataPackage.GameReader(result)
+        gameRecord = decrypt_gameRecord(gameRecord)
+        return get_songs_stat_main(gameRecord, songid, diff)
