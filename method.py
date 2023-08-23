@@ -143,9 +143,9 @@ def get_songs_stat_main(gameRecord, songid, diff):
         if songId == songid:
             if record[0]["level"] == getdiff:
                 return record[0]
-        else:
-            continue
-        return None
+            else:
+                continue
+    return None
 
 
 class BestsRender:
