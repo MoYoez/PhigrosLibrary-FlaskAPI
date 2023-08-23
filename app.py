@@ -154,11 +154,11 @@ def get_song_info():
             "HD": {"rating": result_get_diff_list[1], "charter": result_get_hd_desinger}
         }
         showInDetailed = {
-            "In": {"rating": result_get_diff_list[2], "charter": result_get_in_desinger}
+            "IN": {"rating": result_get_diff_list[2], "charter": result_get_in_desinger}
         }
         if len(result_get_diff_list) >= 4:
             showAtDetailed = {
-                "In": {
+                "AT": {
                     "rating": result_get_diff_list[3],
                     "charter": result_get_at_desinger,
                 }
