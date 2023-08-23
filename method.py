@@ -142,10 +142,10 @@ def get_songs_stat_main(gameRecord, songid, diff):
         record = reader.readRecord(songId)
         if songId == songid:
             if record[0]["level"] == getdiff:
-                return record[0]
+                return record[0], None
             else:
                 continue
-    return None
+    return None, "No Records Found , check songid is correct or the record is existed?"
 
 
 class BestsRender:
@@ -259,6 +259,8 @@ class BestsRender:
             headers=headers,
         )
         result = response.json()["results"][0]["gameFile"]["url"]
+        if result == None:
+            return None, "No Game Record"
         gameRecord = DataPackage.GameReader(result)
         gameRecord = decrypt_gameRecord(gameRecord)
         return get_songs_stat_main(gameRecord, songid, diff)

@@ -68,9 +68,9 @@ def get_songs():
     if diff is None:
         diff = "IN"
     try:
-        Contents = BestsRender.get_songs_stats(session, songs, diff)
+        Contents, msg = BestsRender.get_songs_stats(session, songs, diff)
         if Contents is None:
-            data = {"status": False, "message": "SongID or Diff Not found"}
+            data = {"status": False, "message": msg}
         else:
             get_formatData = BestsRender.get_formatData(session)
             Contents = {"record": Contents}
