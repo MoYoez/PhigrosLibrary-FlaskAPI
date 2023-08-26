@@ -112,7 +112,7 @@ def parse_render_bests(gameRecord, overflow: int):
     if overflow > 21:
         overflow = 21
     reader = ByteReader(gameRecord)
-    for i in range(reader.readVarShort()):
+    for _ in range(reader.readVarShort()):
         songId = reader.readString()[:-2]
         record = reader.readRecord(songId)
         records.extend(record)
@@ -137,7 +137,7 @@ def get_songs_stat_main(gameRecord, songid, diff):
     getdiff = diff  # Diff should be EZ,HD,IN,AT
     if getdiff != "EZ" and getdiff != "HD" and getdiff != "IN" and getdiff != "AT":
         getdiff = "IN"
-    for i in range(reader.readVarShort()):
+    for _ in range(reader.readVarShort()):
         songId = reader.readString()[:-2]
         record = reader.readRecord(songId)
         if songId == songid:
@@ -264,3 +264,50 @@ class BestsRender:
         gameRecord = DataPackage.GameReader(result)
         gameRecord = decrypt_gameRecord(gameRecord)
         return get_songs_stat_main(gameRecord, songid, diff)
+
+
+def song_info_handler_main(songid: str):
+    try:
+        result_info_name = info[songid]
+        result_info_by = info_by[songid]
+        result_get_diff_list: list = difficulty[songid]  # list
+        result_get_ins_by = info_illustrator[songid]
+        result_get_ez_designer = info_ez_desinger[songid]
+        result_get_hd_desinger = info_hd_designer[songid]
+        result_get_in_desinger = info_in_desingner[songid]
+        result_get_at_desinger = info_at_designer[songid]
+        showEZDetailed = {
+            "EZ": {"rating": result_get_diff_list[0], "charter": result_get_ez_designer}
+        }
+        showHDDetailed = {
+            "HD": {"rating": result_get_diff_list[1], "charter": result_get_hd_desinger}
+        }
+        showInDetailed = {
+            "IN": {"rating": result_get_diff_list[2], "charter": result_get_in_desinger}
+        }
+        if len(result_get_diff_list) >= 4:
+            showAtDetailed = {
+                "AT": {
+                    "rating": result_get_diff_list[3],
+                    "charter": result_get_at_desinger,
+                }
+            }
+        else:
+            showAtDetailed = {}
+        getChartDetailedInfo = {
+            **showEZDetailed,
+            **showHDDetailed,
+            **showInDetailed,
+            **showAtDetailed,
+            "level_list": result_get_diff_list,
+        }
+        infos = {
+            "songname": result_info_name,
+            "composer": result_info_by,
+            "illustrator": result_get_ins_by,
+            "chartDetail": getChartDetailedInfo,
+        }
+        content = {"songid": songid, "info": infos}
+        return content
+    except Exception as e:
+        return {}

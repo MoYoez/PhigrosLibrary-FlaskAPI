@@ -10,7 +10,7 @@ Just Like Phigros Unlimited API, due to it's unstable,so I write this.
 
 **Get Users Best, support Overflow songs, you can delete this limit.**
 
-> args: Session | overflow (max:20)
+> args: Session | overflow (max:20) | songinfo Optional(bool) (Default:False)
 
 ```
 {
@@ -63,7 +63,7 @@ Just Like Phigros Unlimited API, due to it's unstable,so I write this.
 
 **Check User's best Songs.**
 
-> args: songid | Session | diff: Optional(Default "IN")
+> args: songid | Session | diff: Optional(Default "IN") | songinfo Optional(bool) (Default:False)
 
 - tips: songid just like "DESTRUCTION321.Normal1zervsBrokenNerdz" || diff just like "EZ" "AT" 
 
@@ -108,7 +108,7 @@ Just Like Phigros Unlimited API, due to it's unstable,so I write this.
 
 - [x] /api/phi/rand
 
-> no args
+> songinfo Optional(bool) (Default:False)
 
 ```
 {
