@@ -10,6 +10,7 @@ from collections import OrderedDict
 
 levels = ["EZ", "HD", "IN", "AT"]
 difficulty = OrderedDict()
+dict_fuzzy = {}
 info = {}
 info_by = {}
 info_illustrator = {}

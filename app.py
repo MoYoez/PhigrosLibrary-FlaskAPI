@@ -9,6 +9,7 @@ from method import (
     levels,
     song_info_handler_main,
 )
+from fuzzy import *
 import random as rand
 
 
@@ -169,6 +170,27 @@ def get_song_info():
         return jsonify({"message": "songid is required."})
     try:
         data = {"status": True, "content": song_info_handler_main(songid=songid)}
+    except Exception as e:
+        return jsonify({"status": False, "message": str(e)})
+    data = json.dumps(data, ensure_ascii=False).encode("utf-8")
+    data = make_response(data)
+    data.headers["Content-Type"] = "application/json; charset=utf-8"
+    return data
+
+
+@app.route("/api/phi/search", methods=["GET"])
+def get_song_id():
+    params = request.args.get("params")
+    if params is None:
+        return jsonify({"message": "No Params, please input params."})
+    try:
+        result_song, possibility, song_id = search_song(parmas=params)
+        result = {
+            "song_name": result_song,
+            "song_ratio": possibility,
+            "song_id": song_id,
+        }
+        data = {"status": True, "content": result}
     except Exception as e:
         return jsonify({"status": False, "message": str(e)})
     data = json.dumps(data, ensure_ascii=False).encode("utf-8")

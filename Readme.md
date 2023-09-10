@@ -160,6 +160,34 @@ Just Like Phigros Unlimited API, due to it's unstable,so I write this.
 }
 ```
 
+- [x] /api/phi/search
+
+> args: params
+
+* Use Difflib SequenceMatcher, maybe not work well :(
+    
+    ```
+{
+    "status": true,
+    "content": {
+        "song_name": "DESTRUCTION 3,2,1",
+        "song_ratio": 0.7857142857142857,
+        "song_id": "DESTRUCTION321.Normal1zervsBrokenNerdz"
+    }
+}
+    
+    ```
+    * If cannot found:
+
+    ```
+{
+    "message": "None",
+    "status": false
+}
+    
+    ```
+
+
 ...
 
 
