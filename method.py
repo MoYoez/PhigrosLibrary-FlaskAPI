@@ -1,11 +1,15 @@
 import base64
-from Crypto.Cipher import AES
-from Crypto.Util import Padding
 import io
 import struct
+
 import zipfile
 import requests
+
 from collections import OrderedDict
+from requests.adapters import HTTPAdapter
+from Crypto.Cipher import AES
+
+from Crypto.Util import Padding
 
 
 levels = ["EZ", "HD", "IN", "AT"]
@@ -195,12 +199,19 @@ class BestsRender:
 
     @staticmethod
     def get_summary(sessionToken):
-        headers = global_headers.copy()
-        headers["X-LC-Session"] = sessionToken
-        response = requests.get(
-            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
-            headers=headers,
-        )
+        try:
+            s = requests.session()
+            s.mount("http://", HTTPAdapter(max_retries=3))
+            s.mount("https://", HTTPAdapter(max_retries=3))
+            headers = global_headers.copy()
+            headers["X-LC-Session"] = sessionToken
+            response = s.get(
+                "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+                headers=headers,
+                timeout=5,
+            )
+        except Exception as e:
+            return None, "Network error."
         result = response.json()["results"][0]
         updateAt = result["updatedAt"]
         url = result["gameFile"]["url"]
@@ -222,12 +233,19 @@ class BestsRender:
 
     @staticmethod
     def get_formatData(sessionToken):
-        headers = global_headers.copy()
-        headers["X-LC-Session"] = sessionToken
-        response = requests.get(
-            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
-            headers=headers,
-        )
+        try:
+            s = requests.session()
+            s.mount("http://", HTTPAdapter(max_retries=3))
+            s.mount("https://", HTTPAdapter(max_retries=3))
+            headers = global_headers.copy()
+            headers["X-LC-Session"] = sessionToken
+            response = s.get(
+                "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+                headers=headers,
+                timeout=5,
+            )
+        except Exception as e:
+            return None, "Network error."
         result = response.json()["results"][0]
         summary = base64.b64decode(result["summary"])
         get_id = BestsRender.get_playerId(sessionToken)
@@ -240,12 +258,19 @@ class BestsRender:
 
     @staticmethod
     def get_bests(session, overflow):
-        headers = global_headers.copy()
-        headers["X-LC-Session"] = session
-        response = requests.get(
-            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
-            headers=headers,
-        )
+        try:
+            s = requests.session()
+            s.mount("http://", HTTPAdapter(max_retries=3))
+            s.mount("https://", HTTPAdapter(max_retries=3))
+            headers = global_headers.copy()
+            headers["X-LC-Session"] = session
+            response = s.get(
+                "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+                headers=headers,
+                timeout=5,
+            )
+        except Exception as e:
+            return None, "Network error."
         result = response.json()["results"][0]["gameFile"]["url"]
         gameRecord = DataPackage.GameReader(result)
         gameRecord = decrypt_gameRecord(gameRecord)
@@ -253,12 +278,19 @@ class BestsRender:
 
     @staticmethod
     def get_songs_stats(session, songid, diff):
-        headers = global_headers.copy()
-        headers["X-LC-Session"] = session
-        response = requests.get(
-            "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
-            headers=headers,
-        )
+        try:
+            s = requests.session()
+            s.mount("http://", HTTPAdapter(max_retries=3))
+            s.mount("https://", HTTPAdapter(max_retries=3))
+            headers = global_headers.copy()
+            headers["X-LC-Session"] = session
+            response = s.get(
+                "https://rak3ffdi.cloud.tds1.tapapis.cn/1.1/classes/_GameSave",
+                headers=headers,
+                timeout=5,
+            )
+        except Exception as e:
+            return None, "Network error."
         result = response.json()["results"][0]["gameFile"]["url"]
         if result == None:
             return None, "No Game Record"
