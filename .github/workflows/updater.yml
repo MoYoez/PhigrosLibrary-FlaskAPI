@@ -17,7 +17,7 @@ jobs:
       - run: pip3 install tqdm
       - uses: actions/checkout@v3
       - run: |
-          python3 handler.py ${{ inputs.url }}
+          python3 gameInformation.py ${{ inputs.url }}
       - run: |
           content=$(date +'%Y-%m-%d')
           git config user.name github-actions
