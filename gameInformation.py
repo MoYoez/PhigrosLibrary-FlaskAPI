@@ -10,7 +10,6 @@ import sys
 
 # download gameinformation from
 
-env = Environment()
 
 filename = sys.argv[1].split("/")[-1]
 
@@ -67,6 +66,7 @@ class ByteReader:
 
 
 def run(path):
+    env = Environment()
     with zipfile.ZipFile(path) as apk:
         with apk.open("assets/bin/Data/globalgamemanagers.assets") as f:
             env.load_file(f.read(), name="assets/bin/Data/globalgamemanagers.assets")
@@ -150,5 +150,7 @@ with open(filename, "wb") as file, tqdm(
     for data in response.iter_content(chunk_size=1024):
         size = file.write(data)
         bar.update(size)
-    run(filename)
-    os.delete(filename)
+
+
+run(filename)
+os.remove(filename)
