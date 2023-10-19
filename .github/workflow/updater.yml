@@ -1,0 +1,27 @@
+name: Update Phigros Recources
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "download url"
+        required: true
+        type: string
+permissions: write-all
+
+
+jobs:
+  starter:
+    name: Fetch And Update
+    runs-on: ubuntu-latest
+    steps:
+      - run: pip3 install tqdm
+      - uses: actions/checkout@v3
+      - run: |
+          python3 handler.py ${{ inputs.url }}
+      - run: |
+          content=$(date +'%Y-%m-%d')
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Update GameResource At $content"
+          git push
