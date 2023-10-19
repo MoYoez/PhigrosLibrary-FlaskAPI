@@ -14,10 +14,10 @@ jobs:
     name: Fetch And Update
     runs-on: ubuntu-latest
     steps:
-      - run: pip3 install tqdm
+      - run: pip3 install tqdm UnityPy
       - uses: actions/checkout@v3
       - run: |
-          python3 handler.py ${{ inputs.url }}
+          python3 gameInformation.py ${{ inputs.url }}
       - run: |
           content=$(date +'%Y-%m-%d')
           git config user.name github-actions

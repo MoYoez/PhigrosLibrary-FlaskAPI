@@ -2,7 +2,7 @@
 
 ### Based On [PhigrosLibrary](https://github.com/7aGiven/PhigrosLibrary)
 
-Just Like Phigros Unlimited API, due to it's unstable,so I write this.
+Just Like Phigros Unlimited API, due to it's ~~unstable~~ (deprecated), so I write this.
 
 ### API List
 
